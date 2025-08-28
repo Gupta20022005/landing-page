@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stampede AI Detection — Drishti</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0c;
+      --fg: #efefef;
+      --muted: #b7b7b7;
+      --accent: #ff7a18;
+      --card: #111216;
+      --grid: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .wrap {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 32px;
+      align-items: stretch
+    }
+
+    header {
+      position: fixed;
+      inset-inline: 0;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 28px;
+      background: linear-gradient(180deg, rgba(12, 12, 12, .96), rgba(12, 12, 12, .65) 70%, rgba(12, 12, 12, 0));
+      backdrop-filter: saturate(140%) blur(6px);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: .08em;
+      font-size: 26px
+    }
+
+    .btns {
+      display: flex;
+      gap: 14px
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #ff7a18;
+      color: #130d06;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 6px 18px rgba(255, 122, 24, .25), inset 0 0 0 1px rgba(0, 0, 0, .12);
+      transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .btn.secondary {
+      background: #202226;
+      color: #eaeaea
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(255, 122, 24, .35)
+    }
+
+    .left {
+      padding: 120px 28px 40px 28px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center
+    }
+
+    .eyebrow {
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      letter-spacing: .24em;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px
+    }
+
+    .hero {
+      font-size: clamp(38px, 6vw, 82px);
+      line-height: .98;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin: 0 0 18px 0;
+      position: relative;
+    }
+
+    .frame {
+      --g: linear-gradient(90deg, #43e97b, #38f9d7, #8a61ff, #ff7a18);
+      position: relative;
+      padding-top: 8px;
+      margin-bottom: 28px;
+      isolation: isolate;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: "";
+      position: absolute;
+      left: -14px;
+      right: 40%;
+      height: 4px;
+      top: -6px;
+      background: var(--g);
+      border-radius: 6px;
+      filter: blur(.3px)
+    }
+
+    .frame::after {
+      left: calc(50% - 8px);
+      right: auto;
+      width: 60px;
+      height: 6px;
+      top: auto;
+      bottom: -8px;
+      background: linear-gradient(90deg, #ff7a18, #ffd479);
+      border-radius: 3px
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 26px 0 34px 0;
+    }
+
+    .tile {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+      border: 1px solid var(--grid);
+      border-radius: 16px;
+      padding: 18px 20px;
+    }
+
+    .code {
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      color: #cfd1d4;
+      font-weight: 600;
+      letter-spacing: .1em
+    }
+
+    .title {
+      font-size: 16px;
+      color: #f3f4f5
+    }
+
+    .cta {
+      font-size: clamp(22px, 3.2vw, 34px);
+      font-weight: 600;
+      opacity: .9;
+      margin-top: 16px
+    }
+
+    .scroll {
+      position: absolute;
+      right: 16px;
+      bottom: 18px;
+      font-size: 12px;
+      color: #9aa0a6;
+      letter-spacing: .18em;
+      text-align: center
+    }
+
+    .scroll .arrow {
+      display: block;
+      margin: 8px auto 0;
+      width: 2px;
+      height: 28px;
+      background: #ffffff1a;
+      position: relative;
+      overflow: hidden
+    }
+
+    .scroll .arrow::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -28px;
+      height: 28px;
+      background: #fff;
+      animation: drop 1.8s linear infinite
+    }
+
+    @keyframes drop {
+      0% {
+        top: -28px
+      }
+
+      60% {
+        top: 0
+      }
+
+      100% {
+        top: 0
+      }
+    }
+
+    .right {
+      position: relative;
+      min-height: 300vh; /* Extended height for scroll effect */
+      overflow: visible;
+    }
+
+    .model-container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none; /* Allow interaction with underlying content */
+      z-index: 10;
+    }
+
+    .model-wrapper {
+      width: 90%;
+      height: 90%;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      pointer-events: auto;
+    }
+
+    iframe.spline-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 20px;
+      background: radial-gradient(1200px 800px at 75% 60%, rgba(255, 255, 255, .075), transparent 60%), var(--bg);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+
+      .right {
+        order: -1;
+        min-height: 200vh;
+      }
+
+      .model-container {
+        position: relative;
+        width: 100%;
+        height: 80vh;
+        top: auto;
+        right: auto;
+      }
+
+      .model-wrapper {
+        width: 100%;
+        height: 100%;
+      }
+
+      header {
+        position: sticky
+      }
+
+      .left {
+        padding-top: 32px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">DRISHTI</div>
+    <nav class="btns" aria-label="primary">
+      <button class="btn secondary" onclick="scrollToFeature('#analyzer')">Dashboard</button>
+      <a class="btn" href="#try" role="button">Try DetectionAI</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- Right: Spline model -->
+    <section class="right" aria-label="3D Model">
+      <div class="model-container">
+        <div class="model-wrapper" id="modelWrapper">
+          <iframe class="spline-frame" id="splineModel"
+            src="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/embed"
+            title="AI Robot 3D Model"
+            frameborder="0"
+            allow="autoplay; camera; microphone; fullscreen; vr; gyroscope; accelerometer; magnetometer; execution-while-out-of-viewport; execution-while-not-rendered; web-share"
+            allowfullscreen
+            loading="eager"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Left: Copy + CTAs -->
+    <section class="left">
+      <div class="eyebrow">UNLEASH THE POWER OF</div>
+      <div class="frame">
+        <h1 class="hero">AI Stampede<br/>Detection</h1>
+      </div>
+
+      <div class="features">
+        <article id="analyzer" class="tile" role="button" tabindex="0">
+          <div class="code">08</div>
+          <div class="title">ADMIN PANNEL</div>
+        </article>
+        <article class="tile" role="button" tabindex="0">
+          <div class="code">09</div>
+          <div class="title">MOBILE APPLICATION</div>
+        </article>
+      </div>
+
+      <p class="cta">Engage with our immersive 3D experience.</p>
+      <div class="scroll" aria-hidden="true">SCROLL <span class="arrow"></span></div>
+    </section>
+  </main>
+
+  <script>
+    // Smooth scroll helper
+    function scrollToFeature(id){
+      const el = document.querySelector(id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    // 3D Model Scroll Effects
+    (function() {
+      const modelWrapper = document.getElementById('modelWrapper');
+      const splineModel = document.getElementById('splineModel');
+      const fallbackModel = document.getElementById('fallbackModel');
+
+      if (!modelWrapper) return;
+
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetX = 0;
+      let targetY = 0;
+
+      // Scroll-based animation
+      function updateModelOnScroll() {
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollProgress = Math.min(scrollY / maxScroll, 1);
+
+        // Calculate downward movement (0 to 100px)
+        const translateY = scrollProgress * 100;
+
+        // Calculate rotation (0 to 720 degrees for double revolution)
+        const rotateY = scrollProgress * 720;
+
+        // Calculate scale effect (1 to 1.2)
+        const scale = 1 + (scrollProgress * 0.2);
+
+        // Apply transform
+        modelWrapper.style.transform = `
+          translateY(${translateY}px)
+          rotateY(${rotateY}deg)
+          scale(${scale})
+          rotateX(${targetY * 0.1}deg)
+          rotateZ(${targetX * 0.05}deg)
+        `;
+      }
+
+      // Global mouse interaction
+      function handleMouseMove(e) {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        mouseX = (e.clientX - centerX) / centerX;
+        mouseY = (e.clientY - centerY) / centerY;
+
+        targetX = mouseX * 15; // Max 15 degree tilt
+        targetY = mouseY * 15; // Max 15 degree tilt
+
+        // Smooth animation for mouse interaction
+        updateModelOnScroll(); // Update with current scroll + mouse position
+      }
+
+      // Enhanced scroll performance with RAF
+      let scrollTicking = false;
+      function onScroll() {
+        if (!scrollTicking) {
+          requestAnimationFrame(() => {
+            updateModelOnScroll();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      }
+
+      // Mouse interaction smoothing
+      let mouseTicking = false;
+      function onMouseMove(e) {
+        if (!mouseTicking) {
+          requestAnimationFrame(() => {
+            handleMouseMove(e);
+            mouseTicking = false;
+          });
+          mouseTicking = true;
+        }
+      }
+
+      // Event listeners
+      window.addEventListener('scroll', onScroll, { passive: true });
+      document.addEventListener('mousemove', onMouseMove, { passive: true });
+
+      // Handle device orientation for mobile
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+          targetX = (e.gamma || 0) / 90 * 15; // gamma: left/right tilt
+          targetY = (e.beta || 0) / 90 * 15;  // beta: front/back tilt
+          updateModelOnScroll();
+        });
+      }
+
+      // Initialize
+      updateModelOnScroll();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        requestAnimationFrame(updateModelOnScroll);
+      });
+
+      // Add some extra interactive effects on model load
+      splineModel.addEventListener('load', () => {
+        modelWrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+        // Add a subtle entrance animation
+        setTimeout(() => {
+          modelWrapper.style.transform += ' scale(1.05)';
+          setTimeout(() => {
+            updateModelOnScroll();
+          }, 300);
+        }, 500);
+      });
+
+    })();
+  </script>
+</body>
+
+</html>

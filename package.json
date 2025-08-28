@@ -1,0 +1,17 @@
+{
+  "name": "stampede-ai-detection",
+  "version": "1.0.0",
+  "description": "Stampede AI Detection landing page with 3D Spline model",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "build": "echo 'Build complete - static files ready'",
+    "start": "npx serve . -p 3000"
+  },
+  "keywords": ["landing-page", "ai", "3d", "spline"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
