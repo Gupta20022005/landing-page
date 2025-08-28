@@ -235,17 +235,39 @@
 
     .right {
       position: relative;
-      min-height: 100vh
+      min-height: 300vh; /* Extended height for scroll effect */
+      overflow: visible;
+    }
+
+    .model-container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none; /* Allow interaction with underlying content */
+      z-index: 10;
+    }
+
+    .model-wrapper {
+      width: 90%;
+      height: 90%;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      pointer-events: auto; /* Re-enable for the actual model */
     }
 
     iframe.spline-frame {
-      position: sticky;
-      top: 0;
-      height: 100vh;
       width: 100%;
+      height: 100%;
       border: 0;
+      border-radius: 20px;
       background: radial-gradient(1200px 800px at 75% 60%, rgba(255, 255, 255, .075), transparent 60%), var(--bg);
-      border-left: 1px solid rgba(255, 255, 255, .06);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
     }
 
     /* Responsive */
@@ -255,7 +277,21 @@
       }
 
       .right {
-        order: -1
+        order: -1;
+        min-height: 200vh;
+      }
+
+      .model-container {
+        position: relative;
+        width: 100%;
+        height: 80vh;
+        top: auto;
+        right: auto;
+      }
+
+      .model-wrapper {
+        width: 100%;
+        height: 100%;
       }
 
       header {
@@ -264,10 +300,6 @@
 
       .left {
         padding-top: 32px
-      }
-
-      iframe.spline-frame {
-        height: 78vh
       }
     }
   </style>
@@ -285,8 +317,15 @@
   <main class="wrap">
     <!-- Right: Spline model -->
     <section class="right" aria-label="3D Model">
-      <iframe class="spline-frame" src="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/"
-        title="AI Robot 3D Model" allow="fullscreen"></iframe>
+      <div class="model-container">
+        <div class="model-wrapper" id="modelWrapper">
+          <iframe class="spline-frame" id="splineModel"
+            src="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/embed"
+            title="AI Robot 3D Model"
+            allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+      </div>
     </section>
 
     <!-- Left: Copy + CTAs -->
@@ -318,6 +357,118 @@
       const el = document.querySelector(id);
       if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
     }
+
+    // 3D Model Scroll Effects
+    (function() {
+      const modelWrapper = document.getElementById('modelWrapper');
+      const splineModel = document.getElementById('splineModel');
+
+      if (!modelWrapper) return;
+
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetX = 0;
+      let targetY = 0;
+
+      // Scroll-based animation
+      function updateModelOnScroll() {
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollProgress = Math.min(scrollY / maxScroll, 1);
+
+        // Calculate downward movement (0 to 100px)
+        const translateY = scrollProgress * 100;
+
+        // Calculate rotation (0 to 720 degrees for double revolution)
+        const rotateY = scrollProgress * 720;
+
+        // Calculate scale effect (1 to 1.2)
+        const scale = 1 + (scrollProgress * 0.2);
+
+        // Apply transform
+        modelWrapper.style.transform = `
+          translateY(${translateY}px)
+          rotateY(${rotateY}deg)
+          scale(${scale})
+          rotateX(${targetY * 0.1}deg)
+          rotateZ(${targetX * 0.05}deg)
+        `;
+      }
+
+      // Global mouse interaction
+      function handleMouseMove(e) {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        mouseX = (e.clientX - centerX) / centerX;
+        mouseY = (e.clientY - centerY) / centerY;
+
+        targetX = mouseX * 15; // Max 15 degree tilt
+        targetY = mouseY * 15; // Max 15 degree tilt
+
+        // Smooth animation for mouse interaction
+        updateModelOnScroll(); // Update with current scroll + mouse position
+      }
+
+      // Enhanced scroll performance with RAF
+      let scrollTicking = false;
+      function onScroll() {
+        if (!scrollTicking) {
+          requestAnimationFrame(() => {
+            updateModelOnScroll();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      }
+
+      // Mouse interaction smoothing
+      let mouseTicking = false;
+      function onMouseMove(e) {
+        if (!mouseTicking) {
+          requestAnimationFrame(() => {
+            handleMouseMove(e);
+            mouseTicking = false;
+          });
+          mouseTicking = true;
+        }
+      }
+
+      // Event listeners
+      window.addEventListener('scroll', onScroll, { passive: true });
+      document.addEventListener('mousemove', onMouseMove, { passive: true });
+
+      // Handle device orientation for mobile
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+          targetX = (e.gamma || 0) / 90 * 15; // gamma: left/right tilt
+          targetY = (e.beta || 0) / 90 * 15;  // beta: front/back tilt
+          updateModelOnScroll();
+        });
+      }
+
+      // Initialize
+      updateModelOnScroll();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        requestAnimationFrame(updateModelOnScroll);
+      });
+
+      // Add some extra interactive effects on model load
+      splineModel.addEventListener('load', () => {
+        modelWrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+        // Add a subtle entrance animation
+        setTimeout(() => {
+          modelWrapper.style.transform += ' scale(1.05)';
+          setTimeout(() => {
+            updateModelOnScroll();
+          }, 300);
+        }, 500);
+      });
+
+    })();
   </script>
 </body>
 
