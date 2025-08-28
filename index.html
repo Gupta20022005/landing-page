@@ -1,286 +1,324 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stampede AI Detection — Drishti</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
   <style>
-    :root{
+    :root {
       --bg: #0c0c0c;
       --fg: #efefef;
       --muted: #b7b7b7;
       --accent: #ff7a18;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%; margin:0}
-    body{
-      font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--bg); color:var(--fg);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      --card: #111216;
+      --grid: rgba(255, 255, 255, 0.08);
     }
 
-    /* Layout */
-    .wrap{
-      min-height:220vh; /* enough scrollable area */
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:28px;
-      align-items:stretch;
+    * {
+      box-sizing: border-box
     }
 
-    /* Left column content */
-    .left{
-      padding:120px 36px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:18px;
-    }
-    .eyebrow{font-family:monospace; letter-spacing:.2em; color:var(--muted); font-size:13px}
-    .hero{font-size:clamp(36px,6vw,72px); line-height:1; font-weight:700; margin:0}
-    .desc{max-width:46ch; color:#dfe3e6}
-
-    /* Right column: container for iframe; keep overflow visible so translateX can show outside column */
-    .right{
-      position:relative;
-      min-height:100vh;
-      overflow:visible;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0 12px;
+    html,
+    body {
+      height: 100%
     }
 
-    /* Perspective wrapper so rotateY looks 3D */
-    .iframe-wrapper{
-      perspective:1200px;
-      -webkit-perspective:1200px;
-      width:100%;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      pointer-events: none; /* wrapper itself shouldn't capture pointer; iframe will */
-      overflow:visible;
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* The visible "card" that holds the iframe — this is the element we transform */
-    .spline-card{
-      transform-style:preserve-3d;
-      will-change: transform;
-      pointer-events: auto; /* allow interacting with the iframe inside */
-      display:block;
-      width: min(760px, 85vw);
-      height: min(760px, 75vh);
-      max-height: 85vh;
-      border-radius:14px;
-      overflow:hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 2px 10px rgba(0,0,0,0.5);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-      transition: box-shadow .2s ease;
+    .wrap {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 32px;
+      align-items: stretch
     }
 
-    /* The iframe itself fills the card */
-    iframe.spline-frame{
-      width:100%;
-      height:100%;
-      border:0;
-      display:block;
-      background:transparent;
+    header {
+      position: fixed;
+      inset-inline: 0;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 28px;
+      background: linear-gradient(180deg, rgba(12, 12, 12, .96), rgba(12, 12, 12, .65) 70%, rgba(12, 12, 12, 0));
+      backdrop-filter: saturate(140%) blur(6px);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
     }
 
-    /* Loading overlay / fallback button */
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: linear-gradient(0deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));
-      color:var(--fg);
-      font-size:15px;
-      gap:12px;
-      z-index:50;
-    }
-    .hidden{display:none}
-
-    .btn{
-      background:var(--accent);
-      color:#120b04;
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:700;
-      border:0;
-      cursor:pointer;
+    .brand {
+      font-weight: 700;
+      letter-spacing: .08em;
+      font-size: 26px
     }
 
-    /* responsive */
-    @media (max-width: 1000px){
-      .wrap{grid-template-columns:1fr}
-      .left{padding:56px 20px}
-      .iframe-wrapper{margin-top:18px}
-      .spline-card{width:90vw; height:58vh}
+    .btns {
+      display: flex;
+      gap: 14px
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #ff7a18;
+      color: #130d06;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 6px 18px rgba(255, 122, 24, .25), inset 0 0 0 1px rgba(0, 0, 0, .12);
+      transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .btn.secondary {
+      background: #202226;
+      color: #eaeaea
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(255, 122, 24, .35)
+    }
+
+    .left {
+      padding: 120px 28px 40px 28px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center
+    }
+
+    .eyebrow {
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      letter-spacing: .24em;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px
+    }
+
+    .hero {
+      font-size: clamp(38px, 6vw, 82px);
+      line-height: .98;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin: 0 0 18px 0;
+      position: relative;
+    }
+
+    .frame {
+      --g: linear-gradient(90deg, #43e97b, #38f9d7, #8a61ff, #ff7a18);
+      position: relative;
+      padding-top: 8px;
+      margin-bottom: 28px;
+      isolation: isolate;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: "";
+      position: absolute;
+      left: -14px;
+      right: 40%;
+      height: 4px;
+      top: -6px;
+      background: var(--g);
+      border-radius: 6px;
+      filter: blur(.3px)
+    }
+
+    .frame::after {
+      left: calc(50% - 8px);
+      right: auto;
+      width: 60px;
+      height: 6px;
+      top: auto;
+      bottom: -8px;
+      background: linear-gradient(90deg, #ff7a18, #ffd479);
+      border-radius: 3px
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 26px 0 34px 0;
+    }
+
+    .tile {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+      border: 1px solid var(--grid);
+      border-radius: 16px;
+      padding: 18px 20px;
+    }
+
+    .code {
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      color: #cfd1d4;
+      font-weight: 600;
+      letter-spacing: .1em
+    }
+
+    .title {
+      font-size: 16px;
+      color: #f3f4f5
+    }
+
+    .cta {
+      font-size: clamp(22px, 3.2vw, 34px);
+      font-weight: 600;
+      opacity: .9;
+      margin-top: 16px
+    }
+
+    .scroll {
+      position: absolute;
+      right: 16px;
+      bottom: 18px;
+      font-size: 12px;
+      color: #9aa0a6;
+      letter-spacing: .18em;
+      text-align: center
+    }
+
+    .scroll .arrow {
+      display: block;
+      margin: 8px auto 0;
+      width: 2px;
+      height: 28px;
+      background: #ffffff1a;
+      position: relative;
+      overflow: hidden
+    }
+
+    .scroll .arrow::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -28px;
+      height: 28px;
+      background: #fff;
+      animation: drop 1.8s linear infinite
+    }
+
+    @keyframes drop {
+      0% {
+        top: -28px
+      }
+
+      60% {
+        top: 0
+      }
+
+      100% {
+        top: 0
+      }
+    }
+
+    .right {
+      position: relative;
+      min-height: 100vh
+    }
+
+    iframe.spline-frame {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      border: 0;
+      background: radial-gradient(1200px 800px at 75% 60%, rgba(255, 255, 255, .075), transparent 60%), var(--bg);
+      border-left: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+
+      .right {
+        order: -1
+      }
+
+      header {
+        position: sticky
+      }
+
+      .left {
+        padding-top: 32px
+      }
+
+      iframe.spline-frame {
+        height: 78vh
+      }
     }
   </style>
 </head>
+
 <body>
+  <header>
+    <div class="brand">DRISHTI</div>
+    <nav class="btns" aria-label="primary">
+      <button class="btn secondary" onclick="scrollToFeature('#analyzer')">Dashboard</button>
+      <a class="btn" href="#try" role="button">Try DetectionAI</a>
+    </nav>
+  </header>
+
   <main class="wrap">
-    <section class="left">
-      <div class="eyebrow">UNLEASH THE POWER OF</div>
-      <h1 class="hero">AI Stampede<br/>Detection</h1>
-      <p class="desc">Scroll to watch the mascot slide from left → right while doing a single full revolution (360°) during the scroll. If the model doesn't show, use the fallback button to open Spline in a new tab.</p>
+    <!-- Right: Spline model -->
+    <section class="right" aria-label="3D Model">
+      <iframe class="spline-frame" src="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/"
+        title="AI Robot 3D Model" allow="fullscreen"></iframe>
     </section>
 
-    <section class="right" aria-label="3D Model area">
-      <div class="iframe-wrapper" aria-hidden="false">
-        <!--
-          Put your Spline preview URL in data-spline-base.
-          Example preview link you provided:
-          https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/
-          The script below will automatically convert it to .../embed
-        -->
-        <div id="splineCard" class="spline-card" role="img" aria-label="Mascot 3D view">
-          <iframe
-            id="splineIframe"
-            class="spline-frame"
-            src=""
-            frameborder="0"
-            allow="fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            data-spline-base="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/">
-          </iframe>
-        </div>
-
-
-        
-        <!-- overlay shown while loading or if embed blocked -->
-        <div id="overlay" class="overlay">
-          <div id="overlayText">Loading 3D scene…</div>
-          <button id="openSpline" class="btn hidden">Open in new tab</button>
-        </div>
+    <!-- Left: Copy + CTAs -->
+    <section class="left">
+      <div class="eyebrow">UNLEASH THE POWER OF</div>
+      <div class="frame">
+        <h1 class="hero">AI Stampede<br/>Detection</h1>
       </div>
+
+      <div class="features">
+        <article id="analyzer" class="tile" role="button" tabindex="0">
+          <div class="code">08</div>
+          <div class="title">ADMIN PANNEL</div>
+        </article>
+        <article class="tile" role="button" tabindex="0">
+          <div class="code">09</div>
+          <div class="title">MOBILE APPLICATION</div>
+        </article>
+      </div>
+
+      <p class="cta">Engage with our immersive 3D experience.</p>
+      <div class="scroll" aria-hidden="true">SCROLL <span class="arrow"></span></div>
     </section>
   </main>
 
   <script>
-    (function () {
-      const iframe = document.getElementById('splineIframe');
-      const card = document.getElementById('splineCard');
-      const overlay = document.getElementById('overlay');
-      const overlayText = document.getElementById('overlayText');
-      const openSplineBtn = document.getElementById('openSpline');
-
-      // Get supplied base URL (preview link). If not present, fallback to current src.
-      const baseUrl = iframe.dataset.splineBase || iframe.getAttribute('src') || '';
-
-      // Compute embed URL (append '/embed' if not present)
-      function toEmbedUrl(u){
-        if(!u) return '';
-        try {
-          // remove trailing spaces
-          u = u.trim();
-          // if already contains '/embed' return as-is
-          if(u.includes('/embed')) return u;
-          // remove trailing slash then add '/embed'
-          return u.replace(/\/+$/, '') + '/embed';
-        } catch (e) {
-          return u;
-        }
-      }
-
-      const embedUrl = toEmbedUrl(baseUrl);
-
-      // Set iframe src to embed version
-      if(embedUrl) {
-        iframe.src = embedUrl;
-      } else {
-        // no url specified — show fallback
-        overlayText.textContent = "No Spline URL provided.";
-        overlay.classList.remove('hidden');
-        openSplineBtn.classList.remove('hidden');
-        openSplineBtn.onclick = () => window.open(baseUrl || '/', '_blank');
-      }
-
-      // Loading / fallback handling:
-      let didLoad = false;
-      const loadTimeoutMs = 3500; // if no onload in this time, show fallback button
-      let loadTimer = setTimeout(() => {
-        if (!didLoad) {
-          overlayText.textContent = "Embedding blocked or slow to load. Open in new tab:";
-          openSplineBtn.classList.remove('hidden');
-          overlay.classList.remove('hidden');
-        }
-      }, loadTimeoutMs);
-
-      // on iframe load, hide overlay
-      iframe.addEventListener('load', () => {
-        didLoad = true;
-        clearTimeout(loadTimer);
-        overlay.classList.add('hidden');
-      });
-
-      // open Spline in new tab fallback
-      openSplineBtn.addEventListener('click', () => {
-        window.open(embedUrl || baseUrl, '_blank');
-      });
-
-      /* -------------------------
-         Scroll-driven transform
-         ------------------------- */
-
-      // Range for horizontal travel in vw (left → right)
-      const RANGE_VW = 20; // moves from -RANGE_VW to +RANGE_VW
-
-      // Throttle/animation vars
-      let latestScrollY = window.scrollY;
-      let ticking = false;
-
-      function onScroll() {
-        latestScrollY = window.scrollY;
-        requestTick();
-      }
-
-      function requestTick() {
-        if (!ticking) {
-          requestAnimationFrame(update);
-          ticking = true;
-        }
-      }
-
-      function clamp01(v){ return Math.min(Math.max(v, 0), 1); }
-
-      function update() {
-        // compute scroll percentage across the whole doc
-        const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-        const scrollPercent = clamp01(latestScrollY / docHeight);
-
-        // horizontal movement [-RANGE_VW .. +RANGE_VW]
-        const moveX = (scrollPercent * 2 * RANGE_VW) - RANGE_VW; // in vw
-
-        // rotate only once (0 -> 360 deg) mapped to scroll percent
-        const rotationDeg = scrollPercent * 360;
-
-        // Optionally add a subtle easing curve to rotation/movement to feel nicer:
-        // For a simple ease-out feel for rotation in the middle, uncomment this line:
-        // const eased = Math.sin(scrollPercent * Math.PI * 0.5); // easeOutSine
-        // use eased wherever you want; below we use linear mapping as requested.
-
-        // set transform: translateX in vw + rotateY
-        card.style.transform = `translateX(${moveX}vw) rotateY(${rotationDeg}deg)`;
-
-        ticking = false;
-      }
-
-      // initial update in case page already scrolled
-      update();
-
-      // attach listener (passive for performance)
-      window.addEventListener('scroll', onScroll, { passive: true });
-
-      // also update on resize because doc height changes
-      window.addEventListener('resize', () => {
-        requestTick();
-      });
-    })();
+    // Smooth scroll helper
+    function scrollToFeature(id){
+      const el = document.querySelector(id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
   </script>
 </body>
+
 </html>
