@@ -257,8 +257,7 @@
       height: 90%;
       transform-style: preserve-3d;
       transition: transform 0.1s ease-out;
-      pointer-events: auto; /* Re-enable for the actual model */
-      position: relative;
+      pointer-events: auto;
     }
 
     iframe.spline-frame {
@@ -269,145 +268,6 @@
       background: radial-gradient(1200px 800px at 75% 60%, rgba(255, 255, 255, .075), transparent 60%), var(--bg);
       box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
       overflow: hidden;
-    }
-
-    /* CSS 3D Fallback Animation */
-    .css-3d-fallback {
-      width: 100%;
-      height: 100%;
-      border-radius: 20px;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 122, 24, 0.3), rgba(67, 233, 123, 0.2), rgba(138, 97, 255, 0.2), transparent 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
-    }
-
-    .robot-container {
-      width: 200px;
-      height: 200px;
-      transform-style: preserve-3d;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .robot-body {
-      width: 100px;
-      height: 120px;
-      background: linear-gradient(145deg, #ff7a18, #ff9a4d);
-      border-radius: 20px;
-      position: relative;
-      margin: 0 auto;
-      box-shadow:
-        inset 0 0 20px rgba(255, 255, 255, 0.2),
-        0 10px 30px rgba(255, 122, 24, 0.4);
-    }
-
-    .robot-head {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(145deg, #43e97b, #38f9d7);
-      border-radius: 50%;
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow:
-        inset 0 0 15px rgba(255, 255, 255, 0.3),
-        0 8px 25px rgba(67, 233, 123, 0.4);
-    }
-
-    .robot-eye {
-      width: 12px;
-      height: 12px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      top: 25px;
-      animation: blink 3s infinite;
-    }
-
-    .robot-eye.left { left: 20px; }
-    .robot-eye.right { right: 20px; }
-
-    .robot-arm {
-      width: 15px;
-      height: 60px;
-      background: linear-gradient(145deg, #8a61ff, #b084ff);
-      border-radius: 10px;
-      position: absolute;
-      top: 20px;
-      animation: wave 4s ease-in-out infinite;
-    }
-
-    .robot-arm.left {
-      left: -20px;
-      transform-origin: top center;
-    }
-    .robot-arm.right {
-      right: -20px;
-      transform-origin: top center;
-      animation-delay: 2s;
-    }
-
-    .particles {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 50%;
-      animation: particle-float 8s linear infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotateY(0deg); }
-      50% { transform: translateY(-20px) rotateY(180deg); }
-    }
-
-    @keyframes blink {
-      0%, 90%, 100% { opacity: 1; }
-      95% { opacity: 0; }
-    }
-
-    @keyframes wave {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-20deg); }
-      75% { transform: rotate(20deg); }
-    }
-
-    @keyframes particle-float {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-10vh) translateX(100px);
-        opacity: 0;
-      }
-    }
-
-    .loading-message {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-      text-align: center;
     }
 
     /* Responsive */
@@ -459,43 +319,11 @@
     <section class="right" aria-label="3D Model">
       <div class="model-container">
         <div class="model-wrapper" id="modelWrapper">
-          <!-- Try multiple Spline models with fallback -->
           <iframe class="spline-frame" id="splineModel"
-            src=""
+            src="https://my.spline.design/genkubgreetingrobot-S1Tdjkk9fxSjcQaQzyVbZy55/"
             title="AI Robot 3D Model"
-            allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            style="display: none;"></iframe>
-
-          <!-- CSS 3D Fallback -->
-          <div class="css-3d-fallback" id="fallbackModel">
-            <div class="particles">
-              <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-              <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
-              <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
-              <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
-              <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
-              <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
-              <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
-              <div class="particle" style="left: 80%; animation-delay: 7s;"></div>
-            </div>
-
-            <div class="robot-container">
-              <div class="robot-body">
-                <div class="robot-head">
-                  <div class="robot-eye left"></div>
-                  <div class="robot-eye right"></div>
-                </div>
-                <div class="robot-arm left"></div>
-                <div class="robot-arm right"></div>
-              </div>
-            </div>
-
-            <div class="loading-message">
-              AI Detection Robot<br>
-              <small>Interactive 3D Experience</small>
-            </div>
-          </div>
+            referrerpolicy="no-referrer-when-downgrade"
+            loading="lazy"></iframe>
         </div>
       </div>
     </section>
@@ -542,44 +370,6 @@
       let mouseY = 0;
       let targetX = 0;
       let targetY = 0;
-      let modelLoaded = false;
-
-      // Try to load Spline models
-      const splineUrls = [
-        'https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode',
-        'https://prod.spline.design/oSebVPHxDrYdRs3K/scene.splinecode',
-        'https://my.spline.design/robot-v1/embed'
-      ];
-
-      function tryLoadSplineModel() {
-        let currentIndex = 0;
-
-        function loadNext() {
-          if (currentIndex >= splineUrls.length) {
-            // All failed, use CSS fallback
-            console.log('Using CSS 3D fallback');
-            return;
-          }
-
-          splineModel.src = splineUrls[currentIndex];
-          currentIndex++;
-        }
-
-        splineModel.onload = () => {
-          modelLoaded = true;
-          splineModel.style.display = 'block';
-          fallbackModel.style.display = 'none';
-        };
-
-        splineModel.onerror = () => {
-          setTimeout(loadNext, 1000);
-        };
-
-        loadNext();
-      }
-
-      // Start trying to load models
-      tryLoadSplineModel();
 
       // Scroll-based animation
       function updateModelOnScroll() {
@@ -668,26 +458,16 @@
 
       // Add some extra interactive effects on model load
       splineModel.addEventListener('load', () => {
-        if (modelLoaded) {
-          modelWrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        modelWrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-          // Add a subtle entrance animation
+        // Add a subtle entrance animation
+        setTimeout(() => {
+          modelWrapper.style.transform += ' scale(1.05)';
           setTimeout(() => {
-            modelWrapper.style.transform += ' scale(1.05)';
-            setTimeout(() => {
-              updateModelOnScroll();
-            }, 300);
-          }, 500);
-        }
+            updateModelOnScroll();
+          }, 300);
+        }, 500);
       });
-
-      // If no model loads after 5 seconds, ensure fallback is visible
-      setTimeout(() => {
-        if (!modelLoaded) {
-          fallbackModel.style.display = 'flex';
-          splineModel.style.display = 'none';
-        }
-      }, 5000);
 
     })();
   </script>
